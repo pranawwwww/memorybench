@@ -3,6 +3,9 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "benchmark": "bun cli/run-benchmark.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
@@ -13,8 +16,9 @@
     "@ai-sdk/anthropic": "^2.0.17",
     "@ai-sdk/google": "^2.0.14",
     "@ai-sdk/google-vertex": "^3.0.74",
+    "@ai-sdk/openai": "^2.0.0",
     "ai": "^5.0.44",
     "dedent": "^1.7.0",
-    "zod": "^4.1.9"
+    "zod": "^3.23.8"
   }
 }
