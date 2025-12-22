@@ -33,7 +33,7 @@ export async function searchMemories(
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${config.apiKey}`,
+            'Authorization': `Api-Key ${config.apiKey}`,
         },
         body: JSON.stringify({
             text: query,

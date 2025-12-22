@@ -14,9 +14,12 @@ async function getProviderSearch(providerName: string) {
     } else if (providerName === 'mem0') {
         const { searchMemories } = await import('../../../providers/mem0/src/search');
         return searchMemories;
-    } else if (providerName === 'zep') {
-        const { searchMemories } = await import('../../../providers/zep/src/search');
-        return searchMemories;
+    } else if (providerName === 'langchain') {
+        const { searchDocuments } = await import('../../../providers/langchain/src/search');
+        return searchDocuments;
+    } else if (providerName === 'fullcontext') {
+        const { searchDocuments } = await import('../../../providers/fullcontext/src/search');
+        return searchDocuments;
     } else {
         throw new Error(`Provider ${providerName} not supported for search`);
     }
@@ -66,8 +69,8 @@ export async function searchAllQuestions(
 
     console.log('');
 
-    // Setup results directory
-    const resultsDir = join(process.cwd(), 'benchmarks/LongMemEval/results');
+    // Setup results directory - centralized in results/{runId}/
+    const resultsDir = join(process.cwd(), 'results', runId, 'search');
     if (!existsSync(resultsDir)) {
         mkdirSync(resultsDir, { recursive: true });
     }

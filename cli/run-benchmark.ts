@@ -2,13 +2,27 @@
 /**
  * Unified CLI for running benchmarks with specific providers
  * Usage: bun run benchmark <benchmark-name> <provider-name> [options]
- * Example: bun run benchmark LongMemEval supermemory --runId=test-run
+ * Example: bun run benchmark LongMemEval supermemory
  */
 
 import { parseArgs } from "util";
 
 const AVAILABLE_BENCHMARKS = ['LongMemEval', 'LoCoMo', 'NoLiMa'];
-const AVAILABLE_PROVIDERS = ['supermemory', 'mem0', 'zep', 'AQRAG', 'ContextualRetrieval'];
+const AVAILABLE_PROVIDERS = ['supermemory', 'mem0', 'langchain', 'fullcontext', 'AQRAG', 'ContextualRetrieval'];
+
+// Helper function to generate runID in format: benchmark_provider_datetime
+function generateRunId(benchmarkName: string, providerName: string): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    const datetime = `${year}${month}${day}_${hours}${minutes}${seconds}`;
+    return `${benchmarkName}_${providerName}_${datetime}`;
+}
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -20,19 +34,30 @@ if (args.length < 2) {
     console.error('Available providers:', AVAILABLE_PROVIDERS.join(', '));
     console.error('');
     console.error('Examples:');
-    console.error('  bun run benchmark LongMemEval supermemory --runId=run1');
-    console.error('  bun run benchmark LongMemEval supermemory --runId=run1 --limit=5');
-    console.error('  bun run benchmark LoCoMo supermemory --runId=run1 --limit=2');
-    console.error('  bun run benchmark NoLiMa supermemory --runId=run1 --limit=10');
-    console.error('  bun run benchmark LongMemEval supermemory --runId=run1 --answeringModel=gpt-4o --judgeModel=gpt-4o');
-    console.error('  bun run benchmark LongMemEval supermemory --runId=run1 --skipIngest');
-    console.error('  bun run benchmark LongMemEval supermemory --runId=run1 --skipSearch');
+    console.error('  bun run benchmark LongMemEval supermemory');
+    console.error('  bun run benchmark LongMemEval supermemory --limit=5');
+    console.error('  bun run benchmark LoCoMo supermemory --limit=2');
+    console.error('  bun run benchmark NoLiMa supermemory --limit=10');
+    console.error('  bun run benchmark LongMemEval supermemory --answeringModel=gpt-4o --judgeModel=gpt-4o');
+    console.error('  bun run benchmark LongMemEval supermemory --skipIngest');
+    console.error('  bun run benchmark LongMemEval supermemory --skipSearch');
+    console.error('');
+    console.error('Note: runId is auto-generated as benchmark_provider_datetime');
+    console.error('      All results are stored in results/ directory');
     process.exit(1);
 }
 
 const benchmarkName = args[0];
 const providerName = args[1];
-const options = args.slice(2);
+let options = args.slice(2);
+
+// Auto-generate runId if not provided
+const hasRunId = options.some(opt => opt.startsWith('--runId='));
+if (!hasRunId) {
+    const runId = generateRunId(benchmarkName, providerName);
+    options.unshift(`--runId=${runId}`);
+    console.log(`Auto-generated runId: ${runId}`);
+}
 
 // Validate benchmark
 if (!AVAILABLE_BENCHMARKS.includes(benchmarkName)) {

@@ -15,9 +15,12 @@ async function getProviderSearch(providerName: string) {
     } else if (providerName === 'mem0') {
         const { searchMemories } = await import('../../../providers/mem0/src/search');
         return searchMemories;
-    } else if (providerName === 'zep') {
-        const { searchMemories } = await import('../../../providers/zep/src/search');
-        return searchMemories;
+    } else if (providerName === 'langchain') {
+        const { searchDocuments } = await import('../../../providers/langchain/src/search');
+        return searchDocuments;
+    } else if (providerName === 'fullcontext') {
+        const { searchDocuments } = await import('../../../providers/fullcontext/src/search');
+        return searchDocuments;
     } else {
         throw new Error(`Provider ${providerName} not supported for search`);
     }
@@ -113,7 +116,7 @@ async function searchSingleSample(
     const questions = sample.qa;
 
     // Setup checkpoint
-    const checkpointDir = join(process.cwd(), 'benchmarks/LoCoMo/checkpoints/search');
+    const checkpointDir = join(process.cwd(), 'results', runId, 'checkpoints', 'search');
     if (!existsSync(checkpointDir)) {
         mkdirSync(checkpointDir, { recursive: true });
     }
@@ -149,9 +152,12 @@ async function searchSingleSample(
             } else if (providerName === 'mem0') {
                 const results = await searchFunction(qa.question, containerTag, { limit: topK });
                 retrievedContext = results.map((r: any) => r.content || r.memory).join('\n\n---\n\n');
-            } else if (providerName === 'zep') {
-                const results = await searchFunction(qa.question, containerTag, { limit: topK, searchScope: 'messages' });
-                retrievedContext = results.map((r: any) => r.content || r.message?.content).join('\n\n---\n\n');
+            } else if (providerName === 'langchain') {
+                const results = await searchFunction(qa.question, containerTag, { limit: topK });
+                retrievedContext = results.map((r: any) => r.content).join('\n\n---\n\n');
+            } else if (providerName === 'fullcontext') {
+                const results = await searchFunction(qa.question, containerTag, { limit: 999999 });
+                retrievedContext = results.map((r: any) => r.content).join('\n\n---\n\n');
             }
 
             const searchResult: QuestionSearchResult = {

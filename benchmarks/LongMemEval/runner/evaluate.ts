@@ -74,14 +74,14 @@ export async function evaluateAllQuestions(
         }
     }
 
-    // Get all result files for this runId
-    const resultsDir = join(process.cwd(), 'benchmarks/LongMemEval/results');
+    // Get all result files for this runId from centralized results directory
+    const resultsDir = join(process.cwd(), 'results', runId, 'search');
     if (!existsSync(resultsDir)) {
-        throw new Error('Results directory not found. Run search phase first.');
+        throw new Error(`Results directory not found: ${resultsDir}. Run search phase first.`);
     }
 
     let resultFiles = readdirSync(resultsDir)
-        .filter(f => f.endsWith('.json') && f.includes(`-${runId}`))
+        .filter(f => f.endsWith('.json'))
         .sort();
 
     // Filter by question types
@@ -117,8 +117,8 @@ export async function evaluateAllQuestions(
 
     console.log('');
 
-    // Setup evaluation directory
-    const evalDir = join(process.cwd(), 'benchmarks/LongMemEval/evaluations');
+    // Setup evaluation directory in centralized results
+    const evalDir = join(process.cwd(), 'results', runId, 'evaluation');
     if (!existsSync(evalDir)) {
         mkdirSync(evalDir, { recursive: true });
     }
@@ -126,8 +126,8 @@ export async function evaluateAllQuestions(
     const typeSuffix = questionTypes.length === 1 ? `-${questionTypes[0]}` : '';
     const rangeSuffix = (options?.startPosition && options?.endPosition)
         ? `-${options.startPosition}-${options.endPosition}`
-        : '-all';
-    const outputFilename = `eval-${runId}-${answeringModel}${typeSuffix}${rangeSuffix}.json`;
+        : '';
+    const outputFilename = `eval-${answeringModel}${typeSuffix}${rangeSuffix}.json`;
     const outputPath = join(evalDir, outputFilename);
 
     let evaluations: EvaluationResult[] = [];

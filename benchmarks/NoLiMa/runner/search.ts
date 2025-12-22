@@ -15,9 +15,12 @@ async function getProviderSearch(providerName: string) {
     } else if (providerName === 'mem0') {
         const { searchMemories } = await import('../../../providers/mem0/src/search');
         return searchMemories;
-    } else if (providerName === 'zep') {
-        const { searchMemories } = await import('../../../providers/zep/src/search');
-        return searchMemories;
+    } else if (providerName === 'langchain') {
+        const { searchDocuments } = await import('../../../providers/langchain/src/search');
+        return searchDocuments;
+    } else if (providerName === 'fullcontext') {
+        const { searchDocuments } = await import('../../../providers/fullcontext/src/search');
+        return searchDocuments;
     } else {
         throw new Error(`Provider ${providerName} not supported for search`);
     }
@@ -45,7 +48,7 @@ export async function searchNoLiMa(
     console.log('');
 
     // Load test cases from ingest phase
-    const ingestDir = join(process.cwd(), 'benchmarks/NoLiMa/checkpoints/ingest');
+    const ingestDir = join(process.cwd(), 'results', runId, 'checkpoints', 'ingest');
     const testCasesPath = join(ingestDir, `testcases-${runId}.json`);
 
     if (!existsSync(testCasesPath)) {
@@ -57,7 +60,7 @@ export async function searchNoLiMa(
     console.log('');
 
     // Setup checkpoint
-    const checkpointDir = join(process.cwd(), 'benchmarks/NoLiMa/checkpoints/search');
+    const checkpointDir = join(process.cwd(), 'results', runId, 'checkpoints', 'search');
     if (!existsSync(checkpointDir)) {
         mkdirSync(checkpointDir, { recursive: true });
     }

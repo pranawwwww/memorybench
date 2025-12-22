@@ -42,8 +42,8 @@ export async function evaluateNoLiMa(
     }
 
     // Load test cases and search results
-    const ingestDir = join(process.cwd(), 'benchmarks/NoLiMa/checkpoints/ingest');
-    const searchDir = join(process.cwd(), 'benchmarks/NoLiMa/checkpoints/search');
+    const ingestDir = join(process.cwd(), 'results', runId, 'checkpoints', 'ingest');
+    const searchDir = join(process.cwd(), 'results', runId, 'checkpoints', 'search');
 
     const testCasesPath = join(ingestDir, `testcases-${runId}.json`);
     const searchResultsPath = join(searchDir, `search-${runId}.json`);
@@ -60,7 +60,7 @@ export async function evaluateNoLiMa(
     console.log('');
 
     const evaluations: EvaluationResult[] = [];
-    const checkpointDir = join(process.cwd(), 'benchmarks/NoLiMa/checkpoints/evaluate');
+    const checkpointDir = join(process.cwd(), 'results', runId, 'checkpoints', 'evaluate');
     if (!existsSync(checkpointDir)) {
         mkdirSync(checkpointDir, { recursive: true });
     }
@@ -127,12 +127,12 @@ export async function evaluateNoLiMa(
     const finalReport = createReport(runId, searchCheckpoint.providerName, answeringModel, judgeModel, testCases, evaluations);
 
     // Save to evaluations directory
-    const evaluationsDir = join(process.cwd(), 'benchmarks/NoLiMa/evaluations');
+    const evaluationsDir = join(process.cwd(), 'results', runId, 'evaluation');
     if (!existsSync(evaluationsDir)) {
         mkdirSync(evaluationsDir, { recursive: true });
     }
 
-    const reportPath = join(evaluationsDir, `eval-${runId}-${answeringModel.replace(/[/:]/g, '-')}.json`);
+    const reportPath = join(evaluationsDir, `eval-${answeringModel.replace(/[/:]/g, '-')}.json`);
     writeFileSync(reportPath, JSON.stringify(finalReport, null, 2));
 
     console.log('');

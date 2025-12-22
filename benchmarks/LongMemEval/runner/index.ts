@@ -185,8 +185,8 @@ export async function runLongMemEval(providerName: string, args: string[]) {
     console.log('BENCHMARK COMPLETE');
     console.log('='.repeat(60));
     console.log('');
-    console.log(`Results saved in:`);
-    console.log(`  - Checkpoints: benchmarks/LongMemEval/checkpoints/`);
-    console.log(`  - Search results: benchmarks/LongMemEval/results/`);
-    console.log(`  - Evaluations: benchmarks/LongMemEval/evaluations/`);
+    console.log(`Results saved in: results/${runId}/`);
+    console.log(`  - Checkpoints: results/${runId}/checkpoints/`);
+    console.log(`  - Search results: results/${runId}/search/`);
+    console.log(`  - Evaluations: results/${runId}/evaluation/`);
 }

@@ -15,8 +15,11 @@ async function getProviderIngest(providerName: string) {
     } else if (providerName === 'mem0') {
         const { ingestContent } = await import('../../../providers/mem0/src/ingest');
         return ingestContent;
-    } else if (providerName === 'zep') {
-        const { ingestContent } = await import('../../../providers/zep/src/ingest');
+    } else if (providerName === 'langchain') {
+        const { ingestContent } = await import('../../../providers/langchain/src/ingest');
+        return ingestContent;
+    } else if (providerName === 'fullcontext') {
+        const { ingestContent } = await import('../../../providers/fullcontext/src/ingest');
         return ingestContent;
     } else {
         throw new Error(`Provider ${providerName} not supported for ingestion`);
@@ -115,7 +118,7 @@ async function ingestSingleSample(
     const conversation = sample.conversation;
 
     // Setup checkpoint
-    const checkpointDir = join(process.cwd(), 'benchmarks/LoCoMo/checkpoints/ingest/session');
+    const checkpointDir = join(process.cwd(), 'results', runId, 'checkpoints', 'ingest');
     if (!existsSync(checkpointDir)) {
         mkdirSync(checkpointDir, { recursive: true });
     }
