@@ -94,12 +94,35 @@ export default class SuperMemoryProvider extends BaseProvider {
         const searchResults = await response.json();
 
         // Transform to standard format
-        return (searchResults.results || []).map((result: any) => ({
-            id: result.id,
-            content: result.memory || '',
-            score: result.similarity || 0,
-            metadata: result.metadata || {},
-            chunks: result.chunks || [],
-        }));
+        // SuperMemory v4 returns results with different content fields:
+        // - result.memory: Extracted semantic memory (may be summarized)
+        // - result.chunks: Raw document chunks with original content
+        // - result.content: Original document content (if available)
+        return (searchResults.results || []).map((result: any) => {
+            // Prefer chunks content (raw text) over memory (extracted/summarized)
+            // This is important for benchmarks that check for exact text retrieval
+            let content = '';
+            
+            if (result.chunks && result.chunks.length > 0) {
+                // Use raw chunk content if available
+                content = result.chunks.map((c: any) => c.content || c.text || '').join('\n');
+            }
+            
+            // Fallback to content, then memory
+            if (!content && result.content) {
+                content = result.content;
+            }
+            if (!content && result.memory) {
+                content = result.memory;
+            }
+            
+            return {
+                id: result.id,
+                content,
+                score: result.similarity || 0,
+                metadata: result.metadata || {},
+                chunks: result.chunks || [],
+            };
+        });
     }
 }

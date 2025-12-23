@@ -183,7 +183,17 @@ async function ingestSingleSample(
             const content = `Here is a conversation session that took place on ${dateTime}:\n\n${conversationText}`;
 
             console.log(`  Ingesting session ${i + 1}/${numberOfSessions}: ${session.sessionId} (${content.length} bytes)...`);
-            await provider.ingest(content, containerTag);
+            
+            // Pass temporal metadata to help providers that support it preserve date information
+            await provider.ingest(content, containerTag, {
+                metadata: {
+                    sessionId: session.sessionId,
+                    sessionDateTime: dateTime,
+                    sampleId,
+                    speakerA,
+                    speakerB,
+                }
+            });
 
             session.ingested = true;
             session.timestamp = new Date().toISOString();
